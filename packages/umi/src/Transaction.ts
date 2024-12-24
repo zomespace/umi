@@ -229,6 +229,27 @@ export type TransactionStatus = {
  *
  * @category Transactions
  */
+// export const addTransactionSignature = (
+//   transaction: Transaction,
+//   signature: TransactionSignature,
+//   signerPublicKey: PublicKey
+// ): Transaction => {
+//   const maxSigners = transaction.message.header.numRequiredSignatures;
+//   const signerPublicKeys = transaction.message.accounts.slice(0, maxSigners);
+//   const signerIndex = signerPublicKeys.findIndex(
+//     (key) => key === signerPublicKey
+//   );
+
+//   if (signerIndex < 0) {
+//     throw new Error(
+//       'The provided signer is not required to sign this transaction.'
+//     );
+//   }
+
+//   const newSignatures = [...transaction.signatures];
+//   newSignatures[signerIndex] = signature;
+//   return { ...transaction, signatures: newSignatures };
+// };
 export const addTransactionSignature = (
   transaction: Transaction,
   signature: TransactionSignature,
@@ -236,8 +257,10 @@ export const addTransactionSignature = (
 ): Transaction => {
   const maxSigners = transaction.message.header.numRequiredSignatures;
   const signerPublicKeys = transaction.message.accounts.slice(0, maxSigners);
+
+  // Normalize PublicKeys to strings for comparison
   const signerIndex = signerPublicKeys.findIndex(
-    (key) => key === signerPublicKey
+    (key) => key.toString() === signerPublicKey.toString()
   );
 
   if (signerIndex < 0) {
@@ -248,5 +271,9 @@ export const addTransactionSignature = (
 
   const newSignatures = [...transaction.signatures];
   newSignatures[signerIndex] = signature;
-  return { ...transaction, signatures: newSignatures };
+
+  return {
+    ...transaction,
+    signatures: newSignatures,
+  };
 };
